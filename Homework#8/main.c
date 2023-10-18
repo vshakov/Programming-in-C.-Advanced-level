@@ -15,7 +15,8 @@ double f2(double x)
 
 double f3(double x) 
 {
-    if (x != 0) {
+    if (x != 0) 
+    {
         return 3 / x;
     } else 
     {
@@ -26,35 +27,32 @@ double f3(double x)
 }
 
 // Функция для вычисления площади методом прямоугольников
-double calculateArea(double a, double b, double epsilon) 
-{
-    double dx = epsilon; // Шаг интегрирования
+double calculateArea(double a, double b, int numIntervals) {
+    double dx = (b - a) / numIntervals;
     double x, y1, y2, y3, area = 0;
 
-    for (x = a; x <= b; x += dx) 
-    {
+    for (x = a; x < b; x += dx) {
         y1 = f1(x);
         y2 = f2(x);
         y3 = f3(x);
 
-        // Находим минимальное значение y
         double minY = y1;
         if (y2 < minY) minY = y2;
         if (y3 < minY) minY = y3;
 
-        // Находим максимальное значение y
         double maxY = y1;
         if (y2 > maxY) maxY = y2;
         if (y3 > maxY) maxY = y3;
 
-        area += (maxY - minY) * dx; // Площадь прямоугольника
+        area += (maxY - minY) * dx;
     }
 
     return area;
 }
 
 int main() {
-    double a, b, epsilon;
+    double a, b;
+    int numIntervals;
 
     printf("Введите начальное значение x (a): ");
     scanf("%lf", &a);
@@ -62,10 +60,10 @@ int main() {
     printf("Введите конечное значение x (b): ");
     scanf("%lf", &b);
 
-    printf("Введите точность (epsilon): ");
-    scanf("%lf", &epsilon);
+    printf("Введите количество интервалов: ");
+    scanf("%d", &numIntervals);
 
-    double area = calculateArea(a, b, epsilon);
+    double area = calculateArea(a, b, numIntervals);
 
     printf("Площадь фигуры: %lf\n", area);
 
