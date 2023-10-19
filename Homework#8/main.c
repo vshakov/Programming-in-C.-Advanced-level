@@ -1,77 +1,63 @@
 #include <stdio.h>
-#define _USE_MATH_DEFINES
 #include <math.h>
 
-// Функции для кривых
-double f1(double x) 
-{
+double f1(double x) {
     return 0.6 * x + 3;
 }
 
-double f2(double x) 
-{
-    return pow(x - 2, 3) - 1;
+double f2(double x) {
+    return 3 * (x - 2) - 1;
 }
 
-double f3(double x) 
-{
-    if (x != 0) 
-    {
-        return 3 / x;
-    } else 
-    {
-        // Обработка случая деления на ноль
-        // Например, можно вернуть бесконечность (infinity)
-        return INFINITY;
-    }
+double f3(double x) {
+if (x != 0) {
+return 3 / x;
+} else {
+return 0; // Здесь можно вернуть любое другое значение, которое соответствует вашей логике
+}
 }
 
-// Функция для вычисления площади методом прямоугольников
-double calculateArea(double a, double b, int numIntervals) {
-    double dx = (b - a) / numIntervals;
-    double x, y1, y2, y3, area = 0;
+double calculate_area(double lower_limit, double upper_limit) {
+    double area = 0;
+    double dx = 0.0001;  // Шаг интегрирования
 
-    for (x = a; x < b; x += dx) {
-        y1 = f1(x);
-        y2 = f2(x);
-        y3 = f3(x);
-
-        double minY = y1;
-        if (y2 < minY) minY = y2;
-        if (y3 < minY) minY = y3;
-
-        double maxY = y1;
-        if (y2 > maxY) maxY = y2;
-        if (y3 > maxY) maxY = y3;
-
-        area += (maxY - minY) * dx;
+    for (double x = lower_limit; x < upper_limit; x += dx) {
+        double height = fmin(fmin(f1(x), f2(x)), f3(x));
+        area += height * dx;
     }
 
     return area;
 }
 
 int main() {
-    double a, b;
-    int numIntervals;
+    // Пересечения с осью x
+    double x_intersection_f1 = -3 / 0.6;
+    double x_intersection_f2 = 2;
+    double x_intersection_f3 = 0;
 
-    printf("Введите начальное значение x (a): ");
-    scanf("%lf", &a);
+    // Пересечения с осью y
+    double y_intersection_f1 = f1(0);
+    double y_intersection_f2 = f2(0);
+    double y_intersection_f3 = f3(0);
 
-    printf("Введите конечное значение x (b): ");
-    scanf("%lf", &b);
+    printf("Пересечения с осью x:\n");
+    printf("f1: x = %lf\n", x_intersection_f1);
+    printf("f2: x = %lf\n", x_intersection_f2);
+    printf("f3: x = %lf\n", x_intersection_f3);
 
-    printf("Введите количество интервалов: ");
-    scanf("%d", &numIntervals);
+    printf("\nПересечения с осью y:\n");
+    printf("f1: y = %lf\n", y_intersection_f1);
+    printf("f2: y = %lf\n", y_intersection_f2);
+    printf("f3: y = %lf\n", y_intersection_f3);
 
-    double area = calculateArea(a, b, numIntervals);
+     // Определение пределов интегрирования
+    double lower_limit = fmax(fmax(x_intersection_f1, x_intersection_f2), x_intersection_f3);
+    double upper_limit = fmin(fmin(x_intersection_f1, x_intersection_f2), x_intersection_f3);
+
+    // Вычисление площади фигуры
+    double area = calculate_area(lower_limit, upper_limit);
 
     printf("Площадь фигуры: %lf\n", area);
 
     return 0;
 }
-
-/* Программа запрашивает начальное и конечное значения x, 
-а также точность (ε) у пользователя. 
-Затем она использует метод прямоугольников для вычисления площади фигуры, 
-ограниченной заданными кривыми, с заданной точностью. 
-Результат выводится на экран. */
