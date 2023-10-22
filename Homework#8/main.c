@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 
+typedef double (*function)(double);
+
 double f1(double x) {
     return 0.6 * x + 3;
 }
@@ -10,77 +12,76 @@ double f2(double x) {
 }
 
 double f3(double x) {
-    if (x != 0) {
-        return 3 / x;
-    } else {
-        // Обработка случая деления на ноль
-        return INFINITY;  // Или любое другое значение, указывающее на отсутствие результата
-    }
+    return 3 / x;
 }
 
-void find_intersections() {
-    double epsilon = 0.00001;  // Погрешность для определения пересечений
-    
-    // Перебор значений x в заданном диапазоне и проверка пересечений между функциями
-    for (double x = -10; x <= 10; x += epsilon) {
-        // Исключаем точку x = 0 при проверке с функцией f3(x)
+double findIntersectionChord(function f1, function f2, double x0, double x1, double eps) {
+    double y0 = f1(x0) - f2(x0);
+    double y1 = f1(x1) - f2(x1);
 
-            double y1 = f1(x);
-            double y2 = f2(x);
-            double y3 = f3(x);
-
-            // Проверка пересечения между функциями
-            if (fabs(y1 - y2) <= epsilon) {
-                printf("Точка пересечения f1(x) и f2(x): x = %lf\n", x);
-            }
-
-            if (fabs(y1 - y3) <= epsilon) {
-                printf("Точка пересечения f1(x) и f3(x): x = %lf\n", x);
-            }
-       
-
-        
+    if (fabs(y1 - y0) < eps) {
+        printf("Не удалось найти точку пересечения с заданной точностью.\n");
+        return NAN;
     }
-}
 
-double find_intersection_f2_f3() {
-    double epsilon = 0.00001;  // Погрешность для определения пересечения
-    double x0 = -10.0;         // Начальное приближение
-    double x1 = 10.0;          // Вторая точка для метода хорд
-    double x = 0.0;            // Инициализация переменной для точки пересечения
+    double x, y;
+    while (fabs(x1 - x0) > eps) {
+        x = x0 - (x1 - x0) * y0 / (y1 - y0);
+        y = f1(x) - f2(x);
 
-    // Итерационный метод хорд
-    while (fabs(x1 - x0) > epsilon) {
-        double y0 = f2(x0) - f3(x0);
-        double y1 = f2(x1) - f3(x1);
-
-        x = x1 - (y1 * (x1 - x0)) / (y1 - y0);
-
-        double y = f2(x) - f3(x);
-
-        if (fabs(y) <= epsilon) {
-            // Найдена точка пересечения с заданной погрешностью
+        if (fabs(y) < eps) {
+            printf("Найдена точка пересечения: x = %lf, y = %lf\n", x, f1(x));
             return x;
-        } else {
-            // Обновление точек x0 и x1
-            x0 = x1;
+        }
+
+        if (y0 * y < 0) {
             x1 = x;
+            y1 = y;
+        } else {
+            x0 = x;
+            y0 = y;
         }
     }
 
-    // Точка пересечения не найдена с заданной точностью
-    printf("Не удалось найти точку пересечения между f2(x) и f3(x) с заданной точностью.\n");
-    return NAN;  // Возвращаем NaN в случае неудачи
+    printf("Не удалось найти точку пересечения с заданной точностью.\n");
+    return NAN;
 }
 
 int main() {
-    find_intersections();
+    double x0 = -10.0;
+    double x1 = -1.0;
+    double eps = 0.000001;
 
-    double intersection = find_intersection_f2_f3();
+    printf("Поиск точек пересечения функций f1(x) = 0.6*x + 3 и f2(x) = (x-2)^3 - 1 методом хорд в диапазоне от -10 до -1:\n");
+    double intersection1 = findIntersectionChord(f1, f2, x0, x1, eps);
 
-    if (!isnan(intersection)) {
-        printf("Точка пересечения f2(x) и f3(x): x = %lf\n", intersection);
-    }
+    printf("Поиск точек пересечения функций f2(x) = (x-2)^3 - 1 и f3(x) = 3/x методом хорд в диапазоне от -10 до -1:\n");
+    intersection1 = findIntersectionChord(f2, f3, x0, x1, eps);
+
+    printf("Поиск точек пересечения функций f1(x) = 0.6*x + 3 - 1 и f3(x) = 3/x методом хорд в диапазоне от -10 до -1:\n");
+    intersection1 = findIntersectionChord(f1, f3, x0, x1, eps);
+
+    x0 = -1.0;
+    x1 = 1.0;
+    printf("Поиск точек пересечения функций f1(x) = 0.6*x + 3 и f2(x) = (x-2)^3 - 1 методом хорд в диапазоне от -1 до 1:\n");
+    double intersection2 = findIntersectionChord(f1, f2, x0, x1, eps);
+
+    printf("Поиск точек пересечения функций f2(x) = (x-2)^3 - 1 и f3(x) = 3/x методом хорд в диапазоне от -1 до 1:\n");
+    intersection2 = findIntersectionChord(f2, f3, x0, x1, eps);
+
+    printf("Поиск точек пересечения функций f1(x) = 0.6*x + 3 - 1 и f3(x) = 3/x методом хорд в диапазоне от -1 до 1:\n");
+    intersection2 = findIntersectionChord(f1, f3, x0, x1, eps);
+
+    x0 = 1.0;
+    x1 = 10.0;
+    printf("Поиск точек пересечения функций f1(x) = 0.6*x + 3 и f2(x) = (x-2)^3 - 1 методом хорд в диапазоне от 1 до 10:\n");
+    double intersection3 = findIntersectionChord(f1, f2, x0, x1, eps);
+
+    printf("Поиск точек пересечения функций f2(x) = (x-2)^3 - 1 и f3(x) = 3/x методом хорд в диапазоне от 1 до 10:\n");
+    intersection3 = findIntersectionChord(f2, f3, x0, x1, eps);
+
+    printf("Поиск точек пересечения функций f1(x) = 0.6*x + 3 - 1 и f3(x) = 3/x методом хорд в диапазоне от 1 до 10:\n");
+    intersection3 = findIntersectionChord(f1, f3, x0, x1, eps);
 
     return 0;
 }
