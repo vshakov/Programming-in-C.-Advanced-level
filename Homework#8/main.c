@@ -49,39 +49,52 @@ double findIntersectionChord(function f1, function f2, double x0, double x1, dou
 
 int main() {
     double x0 = -10.0;
-    double x1 = -1.0;
+    double x1 = -2.0;
     double eps = 0.000001;
 
-    printf("Поиск точек пересечения функций f1(x) = 0.6*x + 3 и f2(x) = (x-2)^3 - 1 методом хорд в диапазоне от -10 до -1:\n");
-    double intersection1 = findIntersectionChord(f1, f2, x0, x1, eps);
+    double intersections[9]; // Array to store the intersections
+    int index = 0; // Index to keep track of the current position in the array
 
-    printf("Поиск точек пересечения функций f2(x) = (x-2)^3 - 1 и f3(x) = 3/x методом хорд в диапазоне от -10 до -1:\n");
-    intersection1 = findIntersectionChord(f2, f3, x0, x1, eps);
+    // Find intersections and store them in the array
+    intersections[index++] = findIntersectionChord(f1, f2, x0, x1, eps);
+    intersections[index++] = findIntersectionChord(f2, f3, x0, x1, eps);
+    intersections[index++] = findIntersectionChord(f1, f3, x0, x1, eps);
 
-    printf("Поиск точек пересечения функций f1(x) = 0.6*x + 3 - 1 и f3(x) = 3/x методом хорд в диапазоне от -10 до -1:\n");
-    intersection1 = findIntersectionChord(f1, f3, x0, x1, eps);
-
-    x0 = -1.0;
+    x0 = -2.0;
     x1 = 1.0;
-    printf("Поиск точек пересечения функций f1(x) = 0.6*x + 3 и f2(x) = (x-2)^3 - 1 методом хорд в диапазоне от -1 до 1:\n");
-    double intersection2 = findIntersectionChord(f1, f2, x0, x1, eps);
 
-    printf("Поиск точек пересечения функций f2(x) = (x-2)^3 - 1 и f3(x) = 3/x методом хорд в диапазоне от -1 до 1:\n");
-    intersection2 = findIntersectionChord(f2, f3, x0, x1, eps);
-
-    printf("Поиск точек пересечения функций f1(x) = 0.6*x + 3 - 1 и f3(x) = 3/x методом хорд в диапазоне от -1 до 1:\n");
-    intersection2 = findIntersectionChord(f1, f3, x0, x1, eps);
+    intersections[index++] = findIntersectionChord(f1, f2, x0, x1, eps);
+    intersections[index++] = findIntersectionChord(f2, f3, x0, x1, eps);
+    intersections[index++] = findIntersectionChord(f1, f3, x0, x1, eps);
 
     x0 = 1.0;
     x1 = 10.0;
-    printf("Поиск точек пересечения функций f1(x) = 0.6*x + 3 и f2(x) = (x-2)^3 - 1 методом хорд в диапазоне от 1 до 10:\n");
-    double intersection3 = findIntersectionChord(f1, f2, x0, x1, eps);
 
-    printf("Поиск точек пересечения функций f2(x) = (x-2)^3 - 1 и f3(x) = 3/x методом хорд в диапазоне от 1 до 10:\n");
-    intersection3 = findIntersectionChord(f2, f3, x0, x1, eps);
+    intersections[index++] = findIntersectionChord(f1, f2, x0, x1, eps);
+    intersections[index++] = findIntersectionChord(f2, f3, x0, x1, eps);
+    intersections[index++] = findIntersectionChord(f1, f3, x0, x1, eps);
 
-    printf("Поиск точек пересечения функций f1(x) = 0.6*x + 3 - 1 и f3(x) = 3/x методом хорд в диапазоне от 1 до 10:\n");
-    intersection3 = findIntersectionChord(f1, f3, x0, x1, eps);
+    // Sort the intersections in ascending order
+    for (int i = 0; i < index - 1; i++) {
+        for (int j = i + 1; j < index; j++) {
+            if (intersections[i] > intersections[j]) {
+                double temp = intersections[i];
+                intersections[i] = intersections[j];
+                intersections[j] = temp;
+            }
+        }
+    }
+
+    // Print the sorted intersections without duplicates
+    printf("Sorted intersections without duplicates:\n");
+    if (index > 0) {
+        printf("%lf\n", intersections[0]);
+        for (int i = 1; i < index; i++) {
+            if (fabs(intersections[i] - intersections[i - 1]) > eps) {
+                printf("%lf\n", intersections[i]);
+            }
+        }
+    }
 
     return 0;
 }
